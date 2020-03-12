@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+REGISTRY=$1;
+TAG=$2;
+if [[ $REGISTRY == "" ]]; then
+       echoerr "image name is required.";
+#elif [ "$REGISTRY" == "" ]; then
+#       echo "registry is required.";
+fi
+return;
+# put all images to $IMAGES variable
+ARR_IMAGES=();
+while [ "$3" != "" ]; do
+       IMAGES="$IMAGES $3";
+       ARR_IMAGES+=($3)
+       shift
+done
+sudo docker-compose up -d --build $IMAGES;
+for i in ${ARR_IMAGES[@]};
+	do
+		REGISTRY_WITH_CONTAINER=$REGISTRY/$i:$TAG
+		IMAGE_ID=$(sudo docker ps -a -q -f name=^/$i$);
+	       	sudo docker commit $IMAGE_ID $REGISTRY_WITH_CONTAINER;
+	        sudo docker push $REGISTRY_WITH_CONTAINER;
+done
+echo "Done Deploying $IMAGES images.";
