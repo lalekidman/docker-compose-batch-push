@@ -6,7 +6,6 @@ if [[ $REGISTRY == "" ]]; then
 #elif [ "$REGISTRY" == "" ]; then
 #       echo "registry is required.";
 fi
-return;
 # put all images to $IMAGES variable
 ARR_IMAGES=();
 while [ "$3" != "" ]; do
@@ -14,12 +13,13 @@ while [ "$3" != "" ]; do
        ARR_IMAGES+=($3)
        shift
 done
-sudo docker-compose up -d --build $IMAGES;
-for i in ${ARR_IMAGES[@]};
+docker-compose up -d --build $IMAGES;
+for SERVICE in ${ARR_IMAGES[@]};
 	do
-		REGISTRY_WITH_CONTAINER=$REGISTRY/$i:$TAG
-		IMAGE_ID=$(sudo docker ps -a -q -f name=^/$i$);
-	       	sudo docker commit $IMAGE_ID $REGISTRY_WITH_CONTAINER;
-	        sudo docker push $REGISTRY_WITH_CONTAINER;
+		REGISTRY_WITH_CONTAINER="$REGISTRY/$SERVICE:$TAG";
+		IMAGE_ID=$(docker ps -a -q -f name=^\*${SERVICE}\$);
+	       	echo "IMAGE_ID: ${IMAGE_ID}"
+		docker commit -c='CMD ["npm", "run", "start"]' $IMAGE_ID $REGISTRY_WITH_CONTAINER;
+	        docker push $REGISTRY_WITH_CONTAINER;
 done
 echo "Done Deploying $IMAGES images.";
