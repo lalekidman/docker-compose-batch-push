@@ -7,4 +7,4 @@ Sample command
 
 "inside of the docker-compose.yml"
 
-../(docker-compose-batch-file directory)/rebuild-images (docker registry) (tag) (docker-compose service name...)
+sudo ../(docker-compose-batch-file directory)/rebuild-images (docker registry) (tag) (docker-compose service name...)
