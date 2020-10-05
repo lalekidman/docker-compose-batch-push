@@ -19,7 +19,13 @@ for SERVICE in ${ARR_IMAGES[@]};
 		REGISTRY_WITH_CONTAINER="$REGISTRY/$SERVICE:$TAG";
 		IMAGE_ID=$(docker ps -a -q -f name=^\*${SERVICE}\$);
 	       	echo "IMAGE_ID: ${IMAGE_ID}"
-		docker commit -c='CMD ["npm", "run", "start"]' $IMAGE_ID $REGISTRY_WITH_CONTAINER;
-	        docker push $REGISTRY_WITH_CONTAINER;
+		if [[ $SERVICE != "nginx" ]]; then
+			echo ">> Change CMD to npm run start";
+			docker commit -c='CMD ["npm", "run", "start"]' $IMAGE_ID $REGISTRY_WITH_CONTAINER;
+		else
+			echo ">> no update";
+			docker commit  $IMAGE_ID $REGISTRY_WITH_CONTAINER;
+		fi
+	  docker push $REGISTRY_WITH_CONTAINER;
 done
 echo "Done Deploying $IMAGES images.";
